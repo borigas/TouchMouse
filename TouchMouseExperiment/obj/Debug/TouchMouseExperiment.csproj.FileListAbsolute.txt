@@ -1,0 +1,14 @@
+D:\Projects\NET\TouchMouseExperiment\TouchMouseExperiment\bin\Debug\TouchMouseExperiment.exe
+D:\Projects\NET\TouchMouseExperiment\TouchMouseExperiment\bin\Debug\TouchMouseExperiment.pdb
+D:\Projects\NET\TouchMouseExperiment\TouchMouseExperiment\bin\Debug\Microsoft.Research.TouchMouseSensor.dll
+D:\Projects\NET\TouchMouseExperiment\TouchMouseExperiment\obj\Debug\ResolveAssemblyReference.cache
+D:\Projects\NET\TouchMouseExperiment\TouchMouseExperiment\obj\Debug\MainWindow.baml
+D:\Projects\NET\TouchMouseExperiment\TouchMouseExperiment\obj\Debug\MainWindow.g.cs
+D:\Projects\NET\TouchMouseExperiment\TouchMouseExperiment\obj\Debug\App.g.cs
+D:\Projects\NET\TouchMouseExperiment\TouchMouseExperiment\obj\Debug\TouchMouseExperiment_MarkupCompile.cache
+D:\Projects\NET\TouchMouseExperiment\TouchMouseExperiment\obj\Debug\TouchMouseExperiment.g.resources
+D:\Projects\NET\TouchMouseExperiment\TouchMouseExperiment\obj\Debug\TouchMouseExperiment.Properties.Resources.resources
+D:\Projects\NET\TouchMouseExperiment\TouchMouseExperiment\obj\Debug\GenerateResource.read.1.tlog
+D:\Projects\NET\TouchMouseExperiment\TouchMouseExperiment\obj\Debug\GenerateResource.write.1.tlog
+D:\Projects\NET\TouchMouseExperiment\TouchMouseExperiment\obj\Debug\TouchMouseExperiment.exe
+D:\Projects\NET\TouchMouseExperiment\TouchMouseExperiment\obj\Debug\TouchMouseExperiment.pdb
