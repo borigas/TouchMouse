@@ -45,8 +45,6 @@ namespace TouchMouseExperiment
 
         void SetSource(TouchMouseSensorEventArgs e)
         {
-            ProcessImage(e.Image, e.Status.m_dwImageWidth, e.Status.m_dwImageHeight);
-
             // Convert bitmap from memory to graphic form.
             //BitmapSource source =
             //    BitmapSource.Create(e.Status.m_dwImageWidth, e.Status.m_dwImageHeight,
@@ -55,10 +53,25 @@ namespace TouchMouseExperiment
 
             //Bitmap
             // Show bitmap in user interface.
-            SensorImage.Source = ProcessImage(e.Image, e.Status.m_dwImageWidth, e.Status.m_dwImageHeight);
+
+            TouchImage ti = new TouchImage()
+            {
+                Height = (byte)e.Status.m_dwImageHeight,
+                Width = (byte)e.Status.m_dwImageWidth,
+                Image = e.Image,
+            };
+            ti.FindTouchPoints();
+
+            foreach (var point in ti.TouchPoints)
+            {
+                System.Diagnostics.Trace.WriteLine(string.Format("{0}, {1}: {2}", point.FocalPointX, point.FocalPointY, point.FocalPointValue));
+            }
+            System.Diagnostics.Trace.WriteLine("--------------------------");
+
+            SensorImage.Source = ti.GetSensorImage();
         }
 
-        private BitmapSource ProcessImage(byte[] originalImage, int width, int height)
+        private BitmapSource ProcessImage2(byte[] originalImage, int width, int height)
         {
             byte[] processedImage = new byte[originalImage.Length * 3];
             int[] currentTouchPoint = null;

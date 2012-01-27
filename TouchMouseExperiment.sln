@@ -2,11 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Externals", "Externals", "{0CED729F-AF92-4619-B34F-8C58441E09B0}"
-	ProjectSection(SolutionItems) = preProject
-		Externals\Microsoft.Research.TouchMouseSensor.dll = Externals\Microsoft.Research.TouchMouseSensor.dll
-		Externals\TouchMouseSensor.dll = Externals\TouchMouseSensor.dll
-		Externals\TouchMouseSensor.lib = Externals\TouchMouseSensor.lib
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TouchMouseExperiment", "TouchMouseExperiment\TouchMouseExperiment.csproj", "{A9C7CAA1-2B3B-4E0F-96F2-667A53F88F73}"
 EndProject
