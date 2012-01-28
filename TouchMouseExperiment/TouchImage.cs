@@ -41,27 +41,12 @@ namespace TouchMouseExperiment
 
         internal ImageSource GetSensorImage()
         {
-            //byte[] processedImage = new byte[3 * Image.Length];
+            return BitmapSource.Create(Width, Height, 96, 96,
+                PixelFormats.Gray8, null, Image, Width);
+        }
 
-            //for (int i = 0; i < Image.Length; i++)
-            //{
-            //    if (TouchPoints.Count(x => i % Width == x.FocalPointX && i / Width == x.FocalPointY) > 0)
-            //    {
-            //        processedImage[3 * i] = 0xff;
-            //        processedImage[3 * i + 1] = 0xff;
-            //        processedImage[3 * i + 2] = 0xff;
-            //        //processedImage[3 * i] = Image[i];
-            //        //processedImage[3 * i + 1] = Image[i];
-            //        //processedImage[3 * i + 2] = Image[i];
-            //    }
-            //    //else
-            //    //{
-            //    //    processedImage[3 * i] = Image[i];
-            //    //}
-            //}
-            //    return BitmapSource.Create(Width, Height, 96, 96,
-            //        PixelFormats.Rgb24, null, processedImage, Width * 3);
-
+        internal ImageSource GetTouchPointImage()
+        {
             byte[] processedImage = new byte[Image.Length];
 
             for (int i = 0; i < Image.Length; i++)
@@ -74,6 +59,30 @@ namespace TouchMouseExperiment
             }
             return BitmapSource.Create(Width, Height, 96, 96,
                 PixelFormats.Gray8, null, processedImage, Width);
+        }
+
+        internal ImageSource GetTouchPointImageColored()
+        {
+            byte[] processedImage = new byte[3 * Image.Length];
+
+            for (int i = 0; i < Image.Length; i++)
+            {
+                if (TouchPoints.Count(x => i % Width == x.FocalPointX && i / Width == x.FocalPointY) > 0)
+                {
+                    //processedImage[3 * i] = 0xff;
+                    //processedImage[3 * i + 1] = 0xff;
+                    //processedImage[3 * i + 2] = 0xff;
+                    processedImage[3 * i] = Image[i];
+                    processedImage[3 * i + 1] = Image[i];
+                    processedImage[3 * i + 2] = Image[i];
+                }
+                else
+                {
+                    processedImage[3 * i] = Image[i];
+                }
+            }
+            return BitmapSource.Create(Width, Height, 96, 96,
+                PixelFormats.Rgb24, null, processedImage, Width * 3);
         }
     }
 }

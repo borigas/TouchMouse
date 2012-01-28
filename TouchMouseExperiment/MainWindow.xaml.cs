@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Research.TouchMouseSensor;
+using System.Diagnostics;
 
 namespace TouchMouseExperiment
 {
@@ -43,32 +44,61 @@ namespace TouchMouseExperiment
             Dispatcher.Invoke((Action<TouchMouseSensorEventArgs>)SetSource, e);
         }
 
+        List<TouchImage> TouchImages = new List<TouchImage>();
+        int ElapsedMillis = 0;
+        const int ElapsedThreshold = 100;
+
         void SetSource(TouchMouseSensorEventArgs e)
         {
-            // Convert bitmap from memory to graphic form.
-            //BitmapSource source =
-            //    BitmapSource.Create(e.Status.m_dwImageWidth, e.Status.m_dwImageHeight,
-            //    96, 96,
-            //    PixelFormats.Gray8, null, e.Image, e.Status.m_dwImageWidth);
-
-            //Bitmap
-            // Show bitmap in user interface.
-
-            TouchImage ti = new TouchImage()
+            if (ElapsedMillis > ElapsedThreshold)
             {
-                Height = (byte)e.Status.m_dwImageHeight,
-                Width = (byte)e.Status.m_dwImageWidth,
-                Image = e.Image,
-            };
-            ti.FindTouchPoints();
+                // Convert bitmap from memory to graphic form.
+                //BitmapSource source =
+                //    BitmapSource.Create(e.Status.m_dwImageWidth, e.Status.m_dwImageHeight,
+                //    96, 96,
+                //    PixelFormats.Gray8, null, e.Image, e.Status.m_dwImageWidth);
 
-            foreach (var point in ti.TouchPoints)
-            {
-                System.Diagnostics.Trace.WriteLine(string.Format("{0}, {1}: {2}", point.FocalPointX, point.FocalPointY, point.FocalPointValue));
+                //Bitmap
+                // Show bitmap in user interface.
+
+                TouchImage ti = new TouchImage()
+                {
+                    Height = (byte)e.Status.m_dwImageHeight,
+                    Width = (byte)e.Status.m_dwImageWidth,
+                    Image = e.Image,
+                };
+
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                ti.FindTouchPoints();
+                sw.Stop();
+
+                if (ti.TouchPoints.Count > 0)
+                {
+                    TouchImages.Add(ti);
+                }
+                else
+                {
+                    TouchImages.Clear();
+                }
+
+                System.Diagnostics.Trace.WriteLine("Elapsed: " + sw.ElapsedMilliseconds + ", Between Events: " + e.Status.m_dwTimeDelta);
+                foreach (var point in ti.TouchPoints)
+                {
+                    System.Diagnostics.Trace.WriteLine(string.Format("{0}, {1}: {2}", point.FocalPointX, point.FocalPointY, point.FocalPointValue));
+                }
+                System.Diagnostics.Trace.WriteLine("--------------------------");
+
+                //SensorImage.Source = ti.GetSensorImage();
+                //SensorImage.Source = ti.GetTouchPointImage();
+                SensorImage.Source = ti.GetTouchPointImageColored();
+
+                ElapsedMillis = 0;
             }
-            System.Diagnostics.Trace.WriteLine("--------------------------");
-
-            SensorImage.Source = ti.GetSensorImage();
+            else
+            {
+                ElapsedMillis += e.Status.m_dwTimeDelta;
+            }
         }
 
         private BitmapSource ProcessImage2(byte[] originalImage, int width, int height)

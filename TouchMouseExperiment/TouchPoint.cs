@@ -7,19 +7,19 @@ namespace TouchMouseExperiment
 {
     class TouchPoint
     {
-        internal byte Top { get; set; }
-        internal byte Bottom { get; set; }
-        internal byte Left { get; set; }
-        internal byte Right { get; set; }
+        internal int Top { get; set; }
+        internal int Bottom { get; set; }
+        internal int Left { get; set; }
+        internal int Right { get; set; }
 
-        internal byte FocalPointX { get; set; }
-        internal byte FocalPointY { get; set; }
+        internal int FocalPointX { get; set; }
+        internal int FocalPointY { get; set; }
         internal byte FocalPointValue { get; set; }
 
         internal static TouchPoint Create(TouchImage touchImage, int i)
         {
-            byte x = (byte)(i % touchImage.Width);
-            byte y = (byte)(i % touchImage.Height);
+            int x = i % touchImage.Width;
+            int y = i / touchImage.Width;
             TouchPoint touchPoint = new TouchPoint()
             {
                 Top = y,
@@ -36,34 +36,34 @@ namespace TouchMouseExperiment
             return touchPoint;
         }
 
-        private void FindAdjacentPoints(TouchImage image, byte x, byte y)
+        private void FindAdjacentPoints(TouchImage image, int x, int y)
         {
             // Look right
             if (x + 1 < image.Width && image[x + 1, y] > 0)
             {
-                AddValidPoint(image, (byte)(x + 1), y);
+                AddValidPoint(image, x + 1, y);
             }
 
             // Look diagonal left-down if it hasn't been checked yet
             if (x == Left && x > 0 && y + 1 < image.Height && image[x - 1, y + 1] > 0)
             {
-                AddValidPoint(image, (byte)(x - 1), (byte)(y + 1));
+                AddValidPoint(image, x - 1, y + 1);
             }
 
             // Look down
             if (y + 1 < image.Height && image[x, y + 1] > 0)
             {
-                AddValidPoint(image, x, (byte)(y + 1));
+                AddValidPoint(image, x, y + 1);
             }
 
             // Look down and right
             if (x + 1 < image.Width && y + 1 < image.Height && image[x + 1, y + 1] > 0)
             {
-                AddValidPoint(image, (byte)(x + 1), (byte)(y + 1));
+                AddValidPoint(image, x + 1, y + 1);
             }
         }
 
-        private void AddValidPoint(TouchImage image, byte x, byte y)
+        private void AddValidPoint(TouchImage image, int x, int y)
         {
             if (FocalPointValue < image[x, y])
             {
