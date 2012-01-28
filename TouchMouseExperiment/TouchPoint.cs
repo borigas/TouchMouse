@@ -5,8 +5,21 @@ using System.Text;
 
 namespace TouchMouseExperiment
 {
+    enum TouchPointType
+    {
+        Unknown,
+        LeftButton,
+        RightButton,
+        LeftEdge,
+        RightEdge,
+    }
+
     class TouchPoint
     {
+        private const int LEFT_MARGIN = 2;
+        private const int RIGHT_MARGIN = 2;
+        private const int MIDDLE_DIVIDER = 7;
+
         internal int Top { get; set; }
         internal int Bottom { get; set; }
         internal int Left { get; set; }
@@ -15,6 +28,8 @@ namespace TouchMouseExperiment
         internal int FocalPointX { get; set; }
         internal int FocalPointY { get; set; }
         internal byte FocalPointValue { get; set; }
+
+        internal TouchPointType TouchPointType { get; set; }
 
         internal static TouchPoint Create(TouchImage touchImage, int i)
         {
@@ -32,8 +47,29 @@ namespace TouchMouseExperiment
             };
 
             touchPoint.FindAdjacentPoints(touchImage, x, y);
+            touchPoint.FindType(touchImage.Width);
 
             return touchPoint;
+        }
+
+        private void FindType(int width)
+        {
+            if (FocalPointX < LEFT_MARGIN)
+            {
+                TouchPointType = TouchPointType.LeftEdge;
+            }
+            else if (FocalPointX >= width - RIGHT_MARGIN)
+            {
+                TouchPointType = TouchPointType.RightEdge;
+            }
+            else if (FocalPointX < MIDDLE_DIVIDER)
+            {
+                TouchPointType = TouchPointType.LeftButton;
+            }
+            else
+            {
+                TouchPointType = TouchPointType.RightButton;
+            }
         }
 
         private void FindAdjacentPoints(TouchImage image, int x, int y)
@@ -89,11 +125,10 @@ namespace TouchMouseExperiment
 
             if (y < Top)
             {
-                System.Diagnostics.Trace.WriteLine("Y=" + y + ", Top=" + Top);
+                System.Diagnostics.Trace.WriteLine("Y:" + y + "should not be less than Top:" + Top);
             }
 
-            //System.Diagnostics.Debug.Assert(y < Top, "y should not be less than Top");
-            //System.Diagnostics.Debug.Assert(x < Left, "x should not be less than Left");
+            System.Diagnostics.Debug.Assert(y >= Top, "Y:" + y + "should be >= than Top:" + Top);
         }
     }
 }

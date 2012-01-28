@@ -64,21 +64,36 @@ namespace TouchMouseExperiment
         internal ImageSource GetTouchPointImageColored()
         {
             byte[] processedImage = new byte[3 * Image.Length];
-
+            TouchPoint tp = null;
             for (int i = 0; i < Image.Length; i++)
             {
-                if (TouchPoints.Count(x => i % Width == x.FocalPointX && i / Width == x.FocalPointY) > 0)
+                if ((tp = TouchPoints.FirstOrDefault(x => i % Width == x.FocalPointX && i / Width == x.FocalPointY)) != null)
                 {
-                    //processedImage[3 * i] = 0xff;
-                    //processedImage[3 * i + 1] = 0xff;
-                    //processedImage[3 * i + 2] = 0xff;
-                    processedImage[3 * i] = Image[i];
-                    processedImage[3 * i + 1] = Image[i];
-                    processedImage[3 * i + 2] = Image[i];
+                    //LeftButton = Blue
+                    //RightButton = Green
+                    //LeftEdge = Blue+Green
+                    //RightEdge = Red+Green
+                    switch (tp.TouchPointType)
+                    {
+                        case TouchPointType.LeftButton:
+                            processedImage[3 * i + 2] = Image[i];
+                            break;
+                        case TouchPointType.RightButton:
+                            processedImage[3 * i + 1] = Image[i];
+                            break;
+                        case TouchPointType.LeftEdge:
+                            processedImage[3 * i + 1] = Image[i];
+                            processedImage[3 * i + 2] = Image[i];
+                            break;
+                        case TouchPointType.RightEdge:
+                            processedImage[3 * i + 0] = Image[i];
+                            processedImage[3 * i + 1] = Image[i];
+                            break;
+                    }
                 }
                 else
                 {
-                    processedImage[3 * i] = Image[i];
+                    //processedImage[3 * i] = Image[i];
                 }
             }
             return BitmapSource.Create(Width, Height, 96, 96,
