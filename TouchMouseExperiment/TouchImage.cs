@@ -69,25 +69,25 @@ namespace TouchMouseExperiment
             {
                 if ((tp = TouchPoints.FirstOrDefault(x => i % Width == x.FocalPointX && i / Width == x.FocalPointY)) != null)
                 {
-                    //LeftButton = Blue
-                    //RightButton = Green
-                    //LeftEdge = Blue+Green
-                    //RightEdge = Red+Green
                     switch (tp.TouchPointType)
                     {
+                        //LeftButton = Blue
                         case TouchPointType.LeftButton:
                             processedImage[3 * i + 2] = Image[i];
                             break;
+                        //RightButton = Green
                         case TouchPointType.RightButton:
                             processedImage[3 * i + 1] = Image[i];
                             break;
+                        //LeftEdge = Red+Green
                         case TouchPointType.LeftEdge:
-                            processedImage[3 * i + 1] = Image[i];
-                            processedImage[3 * i + 2] = Image[i];
-                            break;
-                        case TouchPointType.RightEdge:
                             processedImage[3 * i + 0] = Image[i];
                             processedImage[3 * i + 1] = Image[i];
+                            break;
+                        //RightEdge = Blue+Green
+                        case TouchPointType.RightEdge:
+                            processedImage[3 * i + 1] = Image[i];
+                            processedImage[3 * i + 2] = Image[i];
                             break;
                     }
                 }
@@ -98,6 +98,14 @@ namespace TouchMouseExperiment
             }
             return BitmapSource.Create(Width, Height, 96, 96,
                 PixelFormats.Rgb24, null, processedImage, Width * 3);
+        }
+
+        internal void FindMovement(TouchImage previousImage)
+        {
+            foreach (var point in TouchPoints)
+            {
+                point.Movement = point.FindMovement(previousImage);
+            }
         }
     }
 }

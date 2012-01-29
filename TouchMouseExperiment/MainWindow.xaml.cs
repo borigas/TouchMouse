@@ -35,7 +35,7 @@ namespace TouchMouseExperiment
 
             _timer = new DispatcherTimer();
             _timer.Tick += new EventHandler(TimerTick);
-            _timer.Interval = new TimeSpan(0, 0, 0, 0, ElapsedThreshold);
+            _timer.Interval = new TimeSpan(0, 0, 0, 0, SamplingRate);
             _timer.Start();
         }
 
@@ -53,7 +53,7 @@ namespace TouchMouseExperiment
 
         private DispatcherTimer _timer = null;
         List<TouchImage> TouchImages = new List<TouchImage>();
-        const int ElapsedThreshold = 100;
+        const int SamplingRate = 100;
         private TouchMouseSensorEventArgs _args = null;
 
         void SetSource(TouchMouseSensorEventArgs e)
@@ -65,7 +65,7 @@ namespace TouchMouseExperiment
         {
             if (_args == null)
                 return;
-            
+
             TouchImage ti = new TouchImage()
             {
                 Height = (byte)_args.Status.m_dwImageHeight,
@@ -80,6 +80,10 @@ namespace TouchMouseExperiment
 
             if (ti.TouchPoints.Count > 0)
             {
+                if (TouchImages.Count > 0)
+                {
+                    ti.FindMovement(TouchImages.Last());
+                }
                 TouchImages.Add(ti);
             }
             else
@@ -95,7 +99,7 @@ namespace TouchMouseExperiment
 
             foreach (var point in ti.TouchPoints)
             {
-                System.Diagnostics.Trace.WriteLine(string.Format("{0}, {1}: {2}", point.FocalPointX, point.FocalPointY, point.FocalPointValue));
+                System.Diagnostics.Trace.WriteLine(string.Format("{0}, {1}: {2}", point.FocalPointX, point.FocalPointY, point.Movement));
             }
             System.Diagnostics.Trace.WriteLine("--------------------------");
 

@@ -14,11 +14,26 @@ namespace TouchMouseExperiment
         RightEdge,
     }
 
+    enum TouchPointMovement
+    {
+        Up = 0,
+        UpRight = 1,
+        Right = 2,
+        DownRight = 3,
+        Down = 4,
+        DownLeft = 5,
+        Left = 6,
+        UpLeft = 7,
+        None = 8,
+        New = 9,
+    }
+
     class TouchPoint
     {
         private const int LEFT_MARGIN = 2;
+        private const int LEFT_THRESHOLD = 5;
         private const int RIGHT_MARGIN = 2;
-        private const int MIDDLE_DIVIDER = 7;
+        private const int MIDDLE_DIVIDER = 8;
 
         internal int Top { get; set; }
         internal int Bottom { get; set; }
@@ -28,6 +43,8 @@ namespace TouchMouseExperiment
         internal int FocalPointX { get; set; }
         internal int FocalPointY { get; set; }
         internal byte FocalPointValue { get; set; }
+
+        internal TouchPointMovement Movement { get; set; }
 
         internal TouchPointType TouchPointType { get; set; }
 
@@ -54,7 +71,8 @@ namespace TouchMouseExperiment
 
         private void FindType(int width)
         {
-            if (FocalPointX < LEFT_MARGIN)
+            if (FocalPointY - FocalPointX > LEFT_THRESHOLD)
+            //if (FocalPointX < LEFT_MARGIN)
             {
                 TouchPointType = TouchPointType.LeftEdge;
             }
@@ -129,6 +147,33 @@ namespace TouchMouseExperiment
             }
 
             System.Diagnostics.Debug.Assert(y >= Top, "Y:" + y + "should be >= than Top:" + Top);
+        }
+
+        internal TouchPointMovement FindMovement(TouchImage previousImage)
+        {
+            TouchPointMovement movement;
+            TouchPoint previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == this.TouchPointType);
+            
+            // Try checking points from button region if this point is a button
+            if (previousPoint == null && (this.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || this.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton))
+            {
+                previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || x.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton);
+            }
+
+            if (previousPoint == null)
+            {
+                movement = TouchPointMovement.New;
+            }
+            else if (FocalPointX - previousPoint.FocalPointX == 0 && FocalPointY - previousPoint.FocalPointY == 0)
+            {
+                movement = TouchPointMovement.None;
+            }
+            else
+            {
+                movement = (TouchPointMovement)(Math.Atan2(previousPoint.FocalPointX - FocalPointX, FocalPointY - previousPoint.FocalPointY) * 4 / Math.PI + 4);
+            }
+
+            return movement;
         }
     }
 }
