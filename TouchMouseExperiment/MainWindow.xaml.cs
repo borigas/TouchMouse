@@ -96,11 +96,11 @@ namespace TouchMouseExperiment
 
             foreach (var point in ti.TouchPoints)
             {
+                Trace.WriteLine(string.Format("{0}, {1}", point.FocalPointX, point.FocalPointY));
                 if (point.Gesture != null)
                 {
-                    Trace.WriteLine(string.Join<TouchPointMovement>(", ", point.Gesture));
+                    Trace.WriteLine(string.Join<Movement>(", ", point.Gesture));
                 }
-                Trace.WriteLine(string.Format("{0}, {1}: {2}", point.FocalPointX, point.FocalPointY, point.Movement));
             }
             System.Diagnostics.Trace.WriteLine("--------------------------");
 

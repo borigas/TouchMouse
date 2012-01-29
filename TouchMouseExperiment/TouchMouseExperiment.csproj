@@ -125,6 +125,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="MouseHelper.cs" />
+    <Compile Include="Movement.cs" />
     <Compile Include="TouchImage.cs" />
     <Compile Include="TouchPoint.cs" />
     <Page Include="MainWindow.xaml">

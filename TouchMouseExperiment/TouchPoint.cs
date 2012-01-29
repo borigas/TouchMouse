@@ -14,20 +14,6 @@ namespace TouchMouseExperiment
         RightEdge,
     }
 
-    enum TouchPointMovement
-    {
-        Up = 0,
-        UpRight = 1,
-        Right = 2,
-        DownRight = 3,
-        Down = 4,
-        DownLeft = 5,
-        Left = 6,
-        UpLeft = 7,
-        None = 8,
-        New = 9,
-    }
-
     class TouchPoint
     {
         private const int LEFT_MARGIN = 2;
@@ -45,11 +31,9 @@ namespace TouchMouseExperiment
         internal int FocalPointY { get; set; }
         internal byte FocalPointValue { get; set; }
 
-        internal TouchPointMovement Movement { get; set; }
-
         internal TouchPointType TouchPointType { get; set; }
 
-        internal List<TouchPointMovement> Gesture { get; set; }
+        internal List<Movement> Gesture { get; set; }
 
         internal static TouchPoint Create(TouchImage touchImage, int i)
         {
@@ -152,23 +136,23 @@ namespace TouchMouseExperiment
             System.Diagnostics.Debug.Assert(y >= Top, "Y:" + y + "should be >= than Top:" + Top);
         }
 
-        internal TouchPointMovement FindMovement(TouchPoint previousPoint)
+        internal MovementDirection FindMovementDirection(TouchPoint previousPoint)
         {
-            TouchPointMovement movement;
+            MovementDirection direction;
             if (previousPoint == null)
             {
-                movement = TouchPointMovement.New;
+                direction = MovementDirection.New;
             }
             else if (FocalPointX - previousPoint.FocalPointX == 0 && FocalPointY - previousPoint.FocalPointY == 0)
             {
-                movement = TouchPointMovement.None;
+                direction = MovementDirection.None;
             }
             else
             {
-                movement = (TouchPointMovement)(Math.Atan2(previousPoint.FocalPointX - FocalPointX, FocalPointY - previousPoint.FocalPointY) * 4 / Math.PI + 4);
+                direction = (MovementDirection)(Math.Atan2(previousPoint.FocalPointX - FocalPointX, FocalPointY - previousPoint.FocalPointY) * 4 / Math.PI + 4);
             }
 
-            return movement;
+            return direction;
         }
 
         internal void CreateGesture(TouchImage previousImage)
@@ -180,38 +164,25 @@ namespace TouchMouseExperiment
                 previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || x.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton);
             }
 
-            Movement = FindMovement(previousPoint);
 
-            if(Movement != TouchPointMovement.New)
+            if (previousPoint != null)
             {
-                // If previousPoint.Gesture.Count > GESTURE_MAX_FRAME_COUNT
-                //Gesture = previousPoint.Gesture.GetRange(1, previousPoint.Gesture.Count - 1);
-                // else
-                Gesture = previousPoint.Gesture == null ? new List<TouchPointMovement>() : previousPoint.Gesture;
-                
-                // Don't add consequtive duplicate
-                if (Gesture != null && Movement != Gesture.LastOrDefault())
+                Movement movement = new Movement()
                 {
-                    // Remove near duplicates (left, left-up, left => left)
-                    if (Gesture.Count >= 2 && Movement == Gesture[Gesture.Count - 2] && Math.Abs(Movement - Gesture.LastOrDefault()) <= 1)
-                    {
-                        Gesture.RemoveAt(Gesture.Count - 1);
-                    }
-                    else
-                    {
-                        Gesture.Add(Movement);
-                    }
-                }
+                    Direction = FindMovementDirection(previousPoint),
+                    Magnitude = Math.Sqrt(Math.Pow(previousPoint.FocalPointX - FocalPointX, 2) + Math.Pow(previousPoint.FocalPointY - FocalPointY, 2)),
+                };
+
+                Gesture = previousPoint.Gesture == null ? new List<Movement>() : previousPoint.Gesture;
+                Gesture.Add(movement);
+
+                CheckGesture();
             }
-
-            CheckGesture();
         }
-
-        //private const 
 
         private void CheckGesture()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
     }
 }
