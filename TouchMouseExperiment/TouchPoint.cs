@@ -34,6 +34,7 @@ namespace TouchMouseExperiment
         private const int LEFT_THRESHOLD = 5;
         private const int RIGHT_MARGIN = 2;
         private const int MIDDLE_DIVIDER = 8;
+        private const int INACTIVITY_FRAME_COUNT = 3;
 
         internal int Top { get; set; }
         internal int Bottom { get; set; }
@@ -47,6 +48,8 @@ namespace TouchMouseExperiment
         internal TouchPointMovement Movement { get; set; }
 
         internal TouchPointType TouchPointType { get; set; }
+
+        internal List<TouchPointMovement> Gesture { get; set; }
 
         internal static TouchPoint Create(TouchImage touchImage, int i)
         {
@@ -149,17 +152,9 @@ namespace TouchMouseExperiment
             System.Diagnostics.Debug.Assert(y >= Top, "Y:" + y + "should be >= than Top:" + Top);
         }
 
-        internal TouchPointMovement FindMovement(TouchImage previousImage)
+        internal TouchPointMovement FindMovement(TouchPoint previousPoint)
         {
             TouchPointMovement movement;
-            TouchPoint previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == this.TouchPointType);
-            
-            // Try checking points from button region if this point is a button
-            if (previousPoint == null && (this.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || this.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton))
-            {
-                previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || x.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton);
-            }
-
             if (previousPoint == null)
             {
                 movement = TouchPointMovement.New;
@@ -174,6 +169,40 @@ namespace TouchMouseExperiment
             }
 
             return movement;
+        }
+
+        internal void CreateGesture(TouchImage previousImage)
+        {
+            TouchPoint previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == this.TouchPointType);
+            // Try checking points from button region if this point is a button
+            if (previousPoint == null && (this.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || this.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton))
+            {
+                previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || x.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton);
+            }
+
+            Movement = FindMovement(previousPoint);
+
+            if(Movement != TouchPointMovement.New)
+            {
+                // If previousPoint.Gesture.Count > GESTURE_MAX_FRAME_COUNT
+                //Gesture = previousPoint.Gesture.GetRange(1, previousPoint.Gesture.Count - 1);
+                // else
+                Gesture = previousPoint.Gesture == null ? new List<TouchPointMovement>() : previousPoint.Gesture;
+                
+                // Don't add consequtive duplicate
+                if (Gesture != null && Movement != Gesture.LastOrDefault())
+                {
+                    // Remove near duplicates (left, left-up, left => left)
+                    if (Gesture.Count >= 2 && Movement == Gesture[Gesture.Count - 2] && Math.Abs(Movement - Gesture.LastOrDefault()) <= 1)
+                    {
+                        Gesture.RemoveAt(Gesture.Count - 1);
+                    }
+                    else
+                    {
+                        Gesture.Add(Movement);
+                    }
+                }
+            }
         }
     }
 }

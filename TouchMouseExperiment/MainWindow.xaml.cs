@@ -73,16 +73,13 @@ namespace TouchMouseExperiment
                 Image = _args.Image,
             };
 
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
             ti.FindTouchPoints();
-            sw.Stop();
 
             if (ti.TouchPoints.Count > 0)
             {
                 if (TouchImages.Count > 0)
                 {
-                    ti.FindMovement(TouchImages.Last());
+                    ti.FindGestures(TouchImages.Last());
                 }
                 TouchImages.Add(ti);
             }
@@ -99,13 +96,19 @@ namespace TouchMouseExperiment
 
             foreach (var point in ti.TouchPoints)
             {
-                System.Diagnostics.Trace.WriteLine(string.Format("{0}, {1}: {2}", point.FocalPointX, point.FocalPointY, point.Movement));
+                if (point.Gesture != null)
+                {
+                    Trace.WriteLine(string.Join<TouchPointMovement>(", ", point.Gesture));
+                }
+                Trace.WriteLine(string.Format("{0}, {1}: {2}", point.FocalPointX, point.FocalPointY, point.Movement));
             }
             System.Diagnostics.Trace.WriteLine("--------------------------");
 
             //SensorImage.Source = ti.GetSensorImage();
             //SensorImage.Source = ti.GetTouchPointImage();
             SensorImage.Source = ti.GetTouchPointImageColored();
+
+            _args = null;
         }
     }
 }

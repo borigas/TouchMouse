@@ -100,11 +100,11 @@ namespace TouchMouseExperiment
                 PixelFormats.Rgb24, null, processedImage, Width * 3);
         }
 
-        internal void FindMovement(TouchImage previousImage)
+        internal void FindGestures(TouchImage previousImage)
         {
             foreach (var point in TouchPoints)
             {
-                point.Movement = point.FindMovement(previousImage);
+                point.CreateGesture(previousImage);
             }
         }
     }
