@@ -203,6 +203,15 @@ namespace TouchMouseExperiment
                     }
                 }
             }
+
+            CheckGesture();
+        }
+
+        //private const 
+
+        private void CheckGesture()
+        {
+            throw new NotImplementedException();
         }
     }
 }
