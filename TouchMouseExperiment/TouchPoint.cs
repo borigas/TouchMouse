@@ -31,13 +31,13 @@ namespace TouchMouseExperiment
         internal int FocalPointY { get; set; }
         internal byte FocalPointValue { get; set; }
 
-        internal bool IsEndOfGesture = true;
+        internal bool HasBeenUsed = false;
 
         internal Movement Movement { get; set; }
 
         internal TouchPointType TouchPointType { get; set; }
 
-        internal List<Movement> Gesture { get; set; }
+        internal List<Movement> Movements { get; set; }
 
         internal static TouchPoint Create(TouchImage touchImage, int i)
         {
@@ -146,48 +146,45 @@ namespace TouchMouseExperiment
             System.Diagnostics.Debug.Assert(y >= Top, "Y:" + y + "should be >= than Top:" + Top);
         }
 
-        internal void CreateGesture(TouchImage previousImage)
+        internal void CreateMovement(TouchImage previousImage)
         {
             TouchPoint previousPoint = null;
             if (previousImage != null)
             {
                 //previousPoint = previousImage.TouchPoints.Where(x => x.TouchPointType == this.TouchPointType).OrderBy(x => this.DistanceTo(x)).FirstOrDefault();
-                previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == this.TouchPointType);
+                previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == this.TouchPointType && !x.HasBeenUsed);
                 // Try checking points from button region if this point is a button
                 if (previousPoint == null && (this.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || this.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton))
                 {
                     //previousPoint = previousImage.TouchPoints.Where(x => x.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || x.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton).OrderBy(x => this.DistanceTo(x)).FirstOrDefault();
-                    previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || x.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton);
+                    previousPoint = previousImage.TouchPoints.FirstOrDefault(x => !x.HasBeenUsed && (x.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || x.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton));
                 }
             }
 
             if (previousPoint != null)
             {
-                previousPoint.IsEndOfGesture = false;
+                previousPoint.HasBeenUsed = true;
             }
 
-            if (previousPoint != null && previousPoint.Gesture != null)
+            if (previousPoint != null && previousPoint.Movements != null)
             {
-                Gesture = previousPoint.Gesture;
+                Movements = previousPoint.Movements;
             }
             else
             {
-                Gesture = new List<Movement>();
+                Movements = new List<Movement>();
             }
 
             Movement = Movement.Create(previousPoint, this);
-            if (Movement.Direction != MovementDirection.None)
+            if (Movement.Direction != MovementDirection.None && Movement.Direction != MovementDirection.New)
             {
-                Gesture.Add(Movement);
+                Movements.Add(Movement);
             }
         }
 
         internal double DistanceTo(TouchPoint otherPoint)
         {
-            var xDiff = FocalPointX - otherPoint.FocalPointX;
-            var yDiff = FocalPointY - otherPoint.FocalPointY;
-
-            return Math.Sqrt(xDiff * xDiff + yDiff * yDiff);
+            return MathHelpers.PythagoreanDistance(FocalPointX - otherPoint.FocalPointX, FocalPointY - otherPoint.FocalPointY);
         }
     }
 }

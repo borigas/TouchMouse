@@ -5,10 +5,11 @@ using System.Text;
 
 namespace TouchMouseExperiment
 {
-    enum MovementDirection
+    public enum MovementDirection
     {
-        New = -1,
-        None = 0,
+        None = -101,
+        New = -100,
+        Up = 0,
         UpRight = 1,
         Right = 2,
         DownRight = 3,
@@ -16,7 +17,6 @@ namespace TouchMouseExperiment
         DownLeft = 5,
         Left = 6,
         UpLeft = 7,
-        Up = 8,
     }
 
     class Movement
@@ -76,7 +76,15 @@ namespace TouchMouseExperiment
             //System.Diagnostics.Trace.WriteLine("**" + XMovement + ", " + YMovement + ": " +
             //    (Math.Atan2(-1 * XMovement, -1 * YMovement) * 4 / Math.PI + 4.5) * 45 + "D" +
             //    (MovementDirection)(Math.Atan2(-1 * XMovement, -1 * YMovement) * 4 / Math.PI + 4.5));
-            return (MovementDirection)(Math.Atan2(-1 * XMovement, -1 * YMovement) * 4 / Math.PI + 4.5);
+            int direction = (int)(MathHelpers.FindDirection(XMovement, YMovement) + 22.5) / 45;
+            MovementDirection result = (MovementDirection)(direction % 8);
+
+            System.Diagnostics.Debug.Assert(direction <= 8 && direction >= 0, 
+                "Direction " + direction + " does not fall in expected bounds");
+            System.Diagnostics.Debug.Assert(Enum.GetName(typeof(MovementDirection), direction % 8) != null,
+                "Enum " + result + " for value " + direction % 8 + " not found");
+
+            return result;
         }
     }
 }

@@ -10,12 +10,14 @@ namespace TouchMouseExperiment
 {
     internal class TouchMouse
     {
+        private const int SAMPLING_RATE = 100;
+
         private static TouchMouse _instance = null;
 
         private DispatcherTimer _timer = null;
-        private List<TouchImage> TouchImages = new List<TouchImage>();
-        private const int SamplingRate = 100;
+        private TouchImage _previousImage = null;
         private TouchMouseSensorEventArgs _args = null;
+        private int _frameNumber = 0;
 
         private TouchMouse()
         {
@@ -25,7 +27,7 @@ namespace TouchMouseExperiment
 
             _timer = new DispatcherTimer();
             _timer.Tick += new EventHandler(TimerTick);
-            _timer.Interval = new TimeSpan(0, 0, 0, 0, SamplingRate);
+            _timer.Interval = new TimeSpan(0, 0, 0, 0, SAMPLING_RATE);
         }
 
         public static void Start()
@@ -41,7 +43,6 @@ namespace TouchMouseExperiment
                 _instance._timer.Stop();
                 _instance._timer.Tick -= new EventHandler(_instance.TimerTick);
                 TouchMouseSensorEventManager.Handler -= _instance.TouchMouseSensorHandler;
-                _instance.TouchImages.Clear();
                 _instance = null;
             }
         }
@@ -56,25 +57,29 @@ namespace TouchMouseExperiment
 
         private void TimerTick(object state, EventArgs e)
         {
+            _frameNumber++;
             if (_args == null)
                 return;
 
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            //Stopwatch sw = new Stopwatch();
+            //sw.Start();
 
-            TouchImage ti = new TouchImage()
+            TouchImage currentImage = new TouchImage()
             {
                 Height = (byte)_args.Status.m_dwImageHeight,
                 Width = (byte)_args.Status.m_dwImageWidth,
                 Image = _args.Image,
             };
 
-            ti.FindTouchPoints();
+            currentImage.FindTouchPoints();
 
-            if (ti.TouchPoints.Count > 0)
+            if (currentImage.TouchPoints.Count > 0)
             {
-                ti.FindGestures(TouchImages.LastOrDefault());
-                TouchImages.Add(ti);
+                currentImage.FindMovements(_previousImage);
+
+                // TODO Check touchpoints that were not continued for gestures
+
+                _previousImage = currentImage;
             }
             else
             {
@@ -84,31 +89,37 @@ namespace TouchMouseExperiment
                 //    MouseHelper.LeftClick();
                 //}
 
-                TouchImages.Clear();
+                // TODO Check touchpoints that were not continued for gestures
+
+                _previousImage = currentImage;
             }
 
-            sw.Stop();
-            Trace.WriteLine("Elapsed: " + sw.ElapsedMilliseconds);
+            //sw.Stop();
+            //Trace.WriteLine("Elapsed: " + sw.ElapsedMilliseconds);
 
             bool hasPrinted = false;
-            foreach (var point in ti.TouchPoints)
+            if (currentImage.TouchPoints.Count(x => x.Movement.Magnitude > Movement.MOVEMENT_THRESHOLD) > 0)
             {
-                if (point.Gesture != null && point.Movement.Magnitude > Movement.MOVEMENT_THRESHOLD)//point.Gesture.LastOrDefault() == point.Movement)
+                int movementCount = 0;
+                foreach (var point in currentImage.TouchPoints)
                 {
-                Trace.WriteLine(string.Format("{0}, {1}: {2}, {3}: {4}: {5}", point.FocalPointX, point.FocalPointY, point.Movement.XMovement, point.Movement.YMovement, point.Movement.Magnitude, point.TouchPointType));
-                    Trace.WriteLine(string.Join<Movement>(", ", point.Gesture));
-                Trace.WriteLine("*********************");
-                hasPrinted = true;
+                    movementCount += point.Movements.Count;
+                    //if (point.Gesture != null && point.Movement.Magnitude > Movement.MOVEMENT_THRESHOLD)//point.Gesture.LastOrDefault() == point.Movement)
+                    //{
+                    Trace.WriteLine(string.Format("{0}, {1}: {2}, {3}: {4}: {5}", point.FocalPointX, point.FocalPointY, point.Movement.XMovement, point.Movement.YMovement, point.Movement.Magnitude, point.TouchPointType));
+                    Trace.WriteLine(string.Join<Movement>(", ", point.Movements));
+                    Trace.WriteLine("*********************");
+                    hasPrinted = true;
                 }
             }
             if (hasPrinted)
             {
-                System.Diagnostics.Trace.WriteLine("----------------------------------------------------");
+                System.Diagnostics.Trace.WriteLine("------------------- End Frame " + _frameNumber + " --------------------");
             }
 
             //SensorImage.Source = ti.GetSensorImage();
             //SensorImage.Source = ti.GetTouchPointImage();
-            MainWindow.SetSensorImage(ti.GetTouchPointImageColored());
+            MainWindow.SetSensorImage(currentImage.GetTouchPointImageColored());
 
             _args = null;
         }
