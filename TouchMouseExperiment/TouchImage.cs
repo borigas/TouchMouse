@@ -9,6 +9,10 @@ namespace TouchMouseExperiment
 {
     internal class TouchImage
     {
+        internal const byte TOUCH_THRESHOLD = 0xC0;
+        internal const int VERTICAL_DUPLICATE_POINT_THRESHOLD = 4;
+        internal static readonly TouchPointType[] VERTICAL_NOISE_POTENTIAL_TYPES = new TouchPointType[] { TouchPointType.LeftButton, TouchPointType.RightButton };
+
         internal byte[] Image { get; set; }
         internal byte Width { get; set; }
         internal byte Height { get; set; }
@@ -36,6 +40,20 @@ namespace TouchMouseExperiment
                     TouchPoints.Add(TouchPoint.Create(this, i));
                 }
                 i++;
+            }
+
+            // Remove points that are in the main button area and are well below the others
+            foreach (var touchType in VERTICAL_NOISE_POTENTIAL_TYPES)
+            {
+                var pointsInArea = TouchPoints.Count(x => x.TouchPointType == touchType);
+                if (pointsInArea > 1)
+                {
+                    // Y is inverted
+                    var lowPoint = TouchPoints.Min(x => x.FocalPointY);
+                    var highestPointAllowed = lowPoint + VERTICAL_DUPLICATE_POINT_THRESHOLD;
+                    TouchPoints.RemoveAll(x => x.TouchPointType == touchType && x.FocalPointY > highestPointAllowed);
+                }
+
             }
         }
 
@@ -93,7 +111,7 @@ namespace TouchMouseExperiment
                 }
                 else
                 {
-                    //processedImage[3 * i] = Image[i];
+                    processedImage[3 * i] = Image[i];
                 }
             }
             return BitmapSource.Create(Width, Height, 96, 96,

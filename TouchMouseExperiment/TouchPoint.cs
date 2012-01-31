@@ -17,7 +17,7 @@ namespace TouchMouseExperiment
     class TouchPoint
     {
         private const int LEFT_MARGIN = 2;
-        private const int LEFT_THRESHOLD = 5;
+        private const int LEFT_THUMB_THRESHOLD = 5;
         private const int RIGHT_MARGIN = 2;
         private const int MIDDLE_DIVIDER = 8;
         private const int INACTIVITY_FRAME_COUNT = 3;
@@ -30,6 +30,8 @@ namespace TouchMouseExperiment
         internal int FocalPointX { get; set; }
         internal int FocalPointY { get; set; }
         internal byte FocalPointValue { get; set; }
+
+        internal Movement Movement { get; set; }
 
         internal TouchPointType TouchPointType { get; set; }
 
@@ -58,7 +60,7 @@ namespace TouchMouseExperiment
 
         private void FindType(int width)
         {
-            if (FocalPointY - FocalPointX > LEFT_THRESHOLD)
+            if (FocalPointY - FocalPointX > LEFT_THUMB_THRESHOLD)
             //if (FocalPointX < LEFT_MARGIN)
             {
                 TouchPointType = TouchPointType.LeftEdge;
@@ -85,11 +87,17 @@ namespace TouchMouseExperiment
                 AddValidPoint(image, x + 1, y);
             }
 
-            // Look diagonal left-down if it hasn't been checked yet
-            if (x == Left && x > 0 && y + 1 < image.Height && image[x - 1, y + 1] > 0)
+            // Look left
+            if (x == Left && x > 0 && image[x - 1, y] > 0)
             {
-                AddValidPoint(image, x - 1, y + 1);
+                AddValidPoint(image, x - 1, y);
             }
+
+            // Look diagonal left-down if it hasn't been checked yet
+            //if (x == Left && x > 0 && y + 1 < image.Height && image[x - 1, y + 1] > 0)
+            //{
+            //    AddValidPoint(image, x - 1, y + 1);
+            //}
 
             // Look down
             if (y + 1 < image.Height && image[x, y + 1] > 0)
@@ -98,10 +106,10 @@ namespace TouchMouseExperiment
             }
 
             // Look down and right
-            if (x + 1 < image.Width && y + 1 < image.Height && image[x + 1, y + 1] > 0)
-            {
-                AddValidPoint(image, x + 1, y + 1);
-            }
+            //if (x + 1 < image.Width && y + 1 < image.Height && image[x + 1, y + 1] > 0)
+            //{
+            //    AddValidPoint(image, x + 1, y + 1);
+            //}
         }
 
         private void AddValidPoint(TouchImage image, int x, int y)
@@ -136,53 +144,50 @@ namespace TouchMouseExperiment
             System.Diagnostics.Debug.Assert(y >= Top, "Y:" + y + "should be >= than Top:" + Top);
         }
 
-        internal MovementDirection FindMovementDirection(TouchPoint previousPoint)
+        internal void CreateGesture(TouchImage previousImage)
         {
-            MovementDirection direction;
-            if (previousPoint == null)
+            TouchPoint previousPoint = null;
+            if (previousImage != null)
             {
-                direction = MovementDirection.New;
+                //previousPoint = previousImage.TouchPoints.Where(x => x.TouchPointType == this.TouchPointType).OrderBy(x => this.DistanceTo(x)).FirstOrDefault();
+                previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == this.TouchPointType);
+                // Try checking points from button region if this point is a button
+                if (previousPoint == null && (this.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || this.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton))
+                {
+                    //previousPoint = previousImage.TouchPoints.Where(x => x.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || x.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton).OrderBy(x => this.DistanceTo(x)).FirstOrDefault();
+                    previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || x.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton);
+                }
             }
-            else if (FocalPointX - previousPoint.FocalPointX == 0 && FocalPointY - previousPoint.FocalPointY == 0)
+
+            if (previousPoint != null && previousPoint.Gesture != null)
             {
-                direction = MovementDirection.None;
+                Gesture = previousPoint.Gesture;
             }
             else
             {
-                direction = (MovementDirection)(Math.Atan2(previousPoint.FocalPointX - FocalPointX, FocalPointY - previousPoint.FocalPointY) * 4 / Math.PI + 4);
+                Gesture = new List<Movement>();
             }
 
-            return direction;
-        }
-
-        internal void CreateGesture(TouchImage previousImage)
-        {
-            TouchPoint previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == this.TouchPointType);
-            // Try checking points from button region if this point is a button
-            if (previousPoint == null && (this.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || this.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton))
+            Movement = Movement.Create(previousPoint, this);
+            if (Movement.Direction != MovementDirection.None)
             {
-                previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || x.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton);
+                Gesture.Add(Movement);
             }
 
-
-            if (previousPoint != null)
-            {
-                Movement movement = new Movement()
-                {
-                    Direction = FindMovementDirection(previousPoint),
-                    Magnitude = Math.Sqrt(Math.Pow(previousPoint.FocalPointX - FocalPointX, 2) + Math.Pow(previousPoint.FocalPointY - FocalPointY, 2)),
-                };
-
-                Gesture = previousPoint.Gesture == null ? new List<Movement>() : previousPoint.Gesture;
-                Gesture.Add(movement);
-
-                CheckGesture();
-            }
+            CheckGesture();
         }
 
         private void CheckGesture()
         {
             //throw new NotImplementedException();
+        }
+
+        internal double DistanceTo(TouchPoint otherPoint)
+        {
+            var xDiff = FocalPointX - otherPoint.FocalPointX;
+            var yDiff = FocalPointY - otherPoint.FocalPointY;
+
+            return Math.Sqrt(xDiff * xDiff + yDiff * yDiff);
         }
     }
 }

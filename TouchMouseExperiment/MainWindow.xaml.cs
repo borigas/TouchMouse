@@ -77,10 +77,7 @@ namespace TouchMouseExperiment
 
             if (ti.TouchPoints.Count > 0)
             {
-                if (TouchImages.Count > 0)
-                {
-                    ti.FindGestures(TouchImages.Last());
-                }
+                ti.FindGestures(TouchImages.LastOrDefault());
                 TouchImages.Add(ti);
             }
             else
@@ -94,15 +91,21 @@ namespace TouchMouseExperiment
                 TouchImages.Clear();
             }
 
+            bool hasPrinted = false;
             foreach (var point in ti.TouchPoints)
             {
-                Trace.WriteLine(string.Format("{0}, {1}", point.FocalPointX, point.FocalPointY));
-                if (point.Gesture != null)
+                if (point.Gesture != null && point.Movement.Magnitude > Movement.MOVEMENT_THRESHOLD)//point.Gesture.LastOrDefault() == point.Movement)
                 {
+                Trace.WriteLine(string.Format("{0}, {1}: {2}, {3}: {4}: {5}", point.FocalPointX, point.FocalPointY, point.Movement.XMovement, point.Movement.YMovement, point.Movement.Magnitude, point.TouchPointType));
                     Trace.WriteLine(string.Join<Movement>(", ", point.Gesture));
+                Trace.WriteLine("*********************");
+                hasPrinted = true;
                 }
             }
-            System.Diagnostics.Trace.WriteLine("--------------------------");
+            if (hasPrinted)
+            {
+                System.Diagnostics.Trace.WriteLine("----------------------------------------------------");
+            }
 
             //SensorImage.Source = ti.GetSensorImage();
             //SensorImage.Source = ti.GetTouchPointImage();
