@@ -8,11 +8,15 @@ using System.Diagnostics;
 
 namespace TouchMouseExperiment
 {
+    public delegate void TouchMouseGestureHandler(object sender, TouchMouseGestureEventArgs e);
+
     internal class TouchMouse
     {
         private const int SAMPLING_RATE = 100;
 
         private static TouchMouse _instance = null;
+        public static TouchMouseGestureHandler OnLeftTap;
+        public static TouchMouseGestureHandler OnRightTap;
 
         private DispatcherTimer _timer = null;
         private TouchImage _previousImage = null;
@@ -58,6 +62,8 @@ namespace TouchMouseExperiment
         private void TimerTick(object state, EventArgs e)
         {
             _frameNumber++;
+            MainWindow.ClearMessage();
+
             if (_args == null)
                 return;
 
@@ -76,23 +82,15 @@ namespace TouchMouseExperiment
             if (currentImage.TouchPoints.Count > 0)
             {
                 currentImage.FindMovements(_previousImage);
-
-                // TODO Check touchpoints that were not continued for gestures
-
-                _previousImage = currentImage;
             }
-            else
+
+            // Check touchpoints that were not continued for gestures
+            if (_previousImage != null)
             {
-                // Touch Gesture over
-                //if (TouchImages.Count > 0 && TouchImages.Count < 3)
-                //{
-                //    MouseHelper.LeftClick();
-                //}
-
-                // TODO Check touchpoints that were not continued for gestures
-
-                _previousImage = currentImage;
+                _previousImage.CheckGesture();
             }
+
+            _previousImage = currentImage;
 
             //sw.Stop();
             //Trace.WriteLine("Elapsed: " + sw.ElapsedMilliseconds);

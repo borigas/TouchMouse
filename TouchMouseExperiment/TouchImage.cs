@@ -125,5 +125,51 @@ namespace TouchMouseExperiment
                 point.CreateMovement(previousImage);
             }
         }
+
+        internal void CheckGesture()
+        {
+            // Check ended touch points
+            //var endedPoints = TouchPoints.Where(x => x.HasBeenFollowed == false);
+            //foreach (var endedPoint in endedPoints)
+            //{
+            //}
+
+            CheckForTaps();
+        }
+
+        private void CheckForTaps()
+        {
+            var taps = TouchPoints.Where(x => (x.TouchPointType == TouchPointType.LeftButton || x.TouchPointType == TouchPointType.RightButton)
+                && x.Movements.Count == 0 && x.Movement.InactiveFrameCount <= Movement.INACTIVITY_FRAME_THRESHOLD
+                && x.HasBeenFollowed == false);
+            
+            if (taps.Count() == 1)
+            {
+                if (taps.First().TouchPointType == TouchPointType.LeftButton && TouchMouse.OnLeftTap != null)
+                {
+                    TouchMouse.OnLeftTap(this, new TouchMouseGestureEventArgs()
+                    {
+                        TouchPoints = TouchPoints,
+                        TriggeringTouchPoint = taps.First(),
+                    });
+                }
+                else if(TouchMouse.OnRightTap != null)
+                {
+                    TouchMouse.OnRightTap(this, new TouchMouseGestureEventArgs()
+                    {
+                        TouchPoints = TouchPoints,
+                        TriggeringTouchPoint = taps.First(),
+                    });
+                }
+            }
+            else if (taps.Count() == 2)
+            {
+
+            }
+            else if (taps.Count() == 3)
+            {
+
+            }
+        }
     }
 }

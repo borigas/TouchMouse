@@ -34,12 +34,32 @@ namespace TouchMouseExperiment
             // Ensure the image rendering does not interpolate
             RenderOptions.SetBitmapScalingMode(SensorImage, BitmapScalingMode.NearestNeighbor);
 
+            TouchMouse.OnLeftTap += (object sender, TouchMouseGestureEventArgs e) =>
+            {
+                SetMessage("Left Click for " + e.TriggeringTouchPoint.Movement.InactiveFrameCount + " Frame");
+            };
+            TouchMouse.OnRightTap += (object sender, TouchMouseGestureEventArgs e) =>
+            {
+                SetMessage("Right Click for " + e.TriggeringTouchPoint.Movement.InactiveFrameCount + " Frame");
+            };
+
             TouchMouse.Start();
+            SetMessage("Starting...");
         }
 
         internal static void SetSensorImage(ImageSource image)
         {
             _instance.SensorImage.Source = image;
+        }
+
+        internal static void SetMessage(string text)
+        {
+            _instance.Message.Text = text;
+        }
+
+        internal static void ClearMessage()
+        {
+            _instance.Message.Text = string.Empty;
         }
     }
 }

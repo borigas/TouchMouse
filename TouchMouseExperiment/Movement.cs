@@ -22,6 +22,7 @@ namespace TouchMouseExperiment
     class Movement
     {
         internal const double MOVEMENT_THRESHOLD = 2.5;
+        internal const int INACTIVITY_FRAME_THRESHOLD = 1;
         internal MovementDirection Direction { get; set; }
         internal double Magnitude { get; set; }
         internal int XMovement { get; set; }

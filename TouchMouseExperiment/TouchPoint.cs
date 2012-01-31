@@ -14,24 +14,24 @@ namespace TouchMouseExperiment
         RightEdge,
     }
 
-    class TouchPoint
+    public class TouchPoint
     {
         private const int LEFT_MARGIN = 2;
         private const int LEFT_THUMB_THRESHOLD = 5;
         private const int RIGHT_MARGIN = 2;
         private const int MIDDLE_DIVIDER = 8;
-        private const int INACTIVITY_FRAME_COUNT = 3;
 
         internal int Top { get; set; }
         internal int Bottom { get; set; }
         internal int Left { get; set; }
         internal int Right { get; set; }
 
-        internal int FocalPointX { get; set; }
-        internal int FocalPointY { get; set; }
-        internal byte FocalPointValue { get; set; }
+        public int FocalPointX { get; set; }
+        public int FocalPointY { get; set; }
+        public byte FocalPointValue { get; set; }
 
-        internal bool HasBeenUsed = false;
+        internal bool HasBeenFollowed = false;
+        internal bool HasBeenProcessed = false;
 
         internal Movement Movement { get; set; }
 
@@ -152,18 +152,18 @@ namespace TouchMouseExperiment
             if (previousImage != null)
             {
                 //previousPoint = previousImage.TouchPoints.Where(x => x.TouchPointType == this.TouchPointType).OrderBy(x => this.DistanceTo(x)).FirstOrDefault();
-                previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == this.TouchPointType && !x.HasBeenUsed);
+                previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == this.TouchPointType && !x.HasBeenFollowed);
                 // Try checking points from button region if this point is a button
                 if (previousPoint == null && (this.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || this.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton))
                 {
                     //previousPoint = previousImage.TouchPoints.Where(x => x.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || x.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton).OrderBy(x => this.DistanceTo(x)).FirstOrDefault();
-                    previousPoint = previousImage.TouchPoints.FirstOrDefault(x => !x.HasBeenUsed && (x.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || x.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton));
+                    previousPoint = previousImage.TouchPoints.FirstOrDefault(x => !x.HasBeenFollowed && (x.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || x.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton));
                 }
             }
 
             if (previousPoint != null)
             {
-                previousPoint.HasBeenUsed = true;
+                previousPoint.HasBeenFollowed = true;
             }
 
             if (previousPoint != null && previousPoint.Movements != null)

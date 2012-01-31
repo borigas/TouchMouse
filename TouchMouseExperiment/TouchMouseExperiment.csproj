@@ -129,6 +129,7 @@
     <Compile Include="Movement.cs" />
     <Compile Include="TouchImage.cs" />
     <Compile Include="TouchMouse.cs" />
+    <Compile Include="TouchMouseGestureEventArgs.cs" />
     <Compile Include="TouchPoint.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
