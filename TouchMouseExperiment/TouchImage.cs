@@ -162,13 +162,21 @@ namespace TouchMouseExperiment
                     });
                 }
             }
-            else if (taps.Count() == 2)
+            else if (taps.Count() == 2 && TouchMouse.OnTwoFingerTap != null)
             {
-
+                TouchMouse.OnTwoFingerTap(this, new TouchMouseGestureEventArgs()
+                {
+                    TouchPoints = TouchPoints,
+                    TriggeringTouchPoint = taps.First(),
+                });
             }
             else if (taps.Count() == 3)
             {
-
+                TouchMouse.OnThreeFingerTap(this, new TouchMouseGestureEventArgs()
+                {
+                    TouchPoints = TouchPoints,
+                    TriggeringTouchPoint = taps.First(),
+                });
             }
         }
     }

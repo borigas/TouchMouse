@@ -36,12 +36,25 @@ namespace TouchMouseExperiment
 
             TouchMouse.OnLeftTap += (object sender, TouchMouseGestureEventArgs e) =>
             {
-                SetMessage("Left Click for " + e.TriggeringTouchPoint.Movement.InactiveFrameCount + " Frame");
+                SetMessage("Left Click for " + e.TriggeringTouchPoint.Movement.InactiveFrameCount + " Frames");
+                InputHelper.LeftClick();
             };
             TouchMouse.OnRightTap += (object sender, TouchMouseGestureEventArgs e) =>
             {
-                SetMessage("Right Click for " + e.TriggeringTouchPoint.Movement.InactiveFrameCount + " Frame");
+                SetMessage("Right Click for " + e.TriggeringTouchPoint.Movement.InactiveFrameCount + " Frames");
+                InputHelper.RightClick();
             };
+            TouchMouse.OnTwoFingerTap += (object sender, TouchMouseGestureEventArgs e) =>
+            {
+                SetMessage("Left/Right Click for " + e.TouchPoints.Max(x => x.Movement.InactiveFrameCount + ((x.Movement.InactiveFrameCount <= Movement.INACTIVITY_FRAME_THRESHOLD) ? 0 : int.MinValue)) + " Frames");
+                InputHelper.MiddleClick();
+            };
+            TouchMouse.OnThreeFingerTap += (object sender, TouchMouseGestureEventArgs e) =>
+            {
+                SetMessage("3 Finger Click for " + e.TouchPoints.Max(x => x.Movement.InactiveFrameCount + ((x.Movement.InactiveFrameCount <= Movement.INACTIVITY_FRAME_THRESHOLD) ? 0 : int.MinValue)) + " Frames");
+                InputHelper.PlayPause();
+            };
+
 
             TouchMouse.Start();
             SetMessage("Starting...");

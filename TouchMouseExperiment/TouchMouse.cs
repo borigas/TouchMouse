@@ -17,6 +17,8 @@ namespace TouchMouseExperiment
         private static TouchMouse _instance = null;
         public static TouchMouseGestureHandler OnLeftTap;
         public static TouchMouseGestureHandler OnRightTap;
+        public static TouchMouseGestureHandler OnTwoFingerTap;
+        public static TouchMouseGestureHandler OnThreeFingerTap;
 
         private DispatcherTimer _timer = null;
         private TouchImage _previousImage = null;
@@ -67,8 +69,8 @@ namespace TouchMouseExperiment
             if (_args == null)
                 return;
 
-            //Stopwatch sw = new Stopwatch();
-            //sw.Start();
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
 
             TouchImage currentImage = new TouchImage()
             {
@@ -92,8 +94,9 @@ namespace TouchMouseExperiment
 
             _previousImage = currentImage;
 
-            //sw.Stop();
-            //Trace.WriteLine("Elapsed: " + sw.ElapsedMilliseconds);
+            sw.Stop();
+            Trace.WriteLine("Elapsed: " + sw.ElapsedMilliseconds);
+            MainWindow.SetMessage("Elapsed: " + sw.ElapsedMilliseconds);
 
             bool hasPrinted = false;
             if (currentImage.TouchPoints.Count(x => x.Movement.Magnitude > Movement.MOVEMENT_THRESHOLD) > 0)
