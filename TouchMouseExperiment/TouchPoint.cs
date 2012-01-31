@@ -31,6 +31,8 @@ namespace TouchMouseExperiment
         internal int FocalPointY { get; set; }
         internal byte FocalPointValue { get; set; }
 
+        internal bool IsEndOfGesture = true;
+
         internal Movement Movement { get; set; }
 
         internal TouchPointType TouchPointType { get; set; }
@@ -159,6 +161,11 @@ namespace TouchMouseExperiment
                 }
             }
 
+            if (previousPoint != null)
+            {
+                previousPoint.IsEndOfGesture = false;
+            }
+
             if (previousPoint != null && previousPoint.Gesture != null)
             {
                 Gesture = previousPoint.Gesture;
@@ -173,13 +180,6 @@ namespace TouchMouseExperiment
             {
                 Gesture.Add(Movement);
             }
-
-            CheckGesture();
-        }
-
-        private void CheckGesture()
-        {
-            //throw new NotImplementedException();
         }
 
         internal double DistanceTo(TouchPoint otherPoint)
