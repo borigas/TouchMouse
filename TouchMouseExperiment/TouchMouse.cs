@@ -12,7 +12,7 @@ namespace TouchMouseExperiment
 
     internal class TouchMouse
     {
-        private const int SAMPLING_RATE = 100;
+        public const int SAMPLING_RATE = 100;
 
         private static TouchMouse _instance = null;
         public static TouchMouseGestureHandler OnLeftTap;

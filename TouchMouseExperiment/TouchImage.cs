@@ -10,7 +10,7 @@ namespace TouchMouseExperiment
     internal class TouchImage
     {
         internal const byte TOUCH_THRESHOLD = 0xC0;
-        internal const int VERTICAL_DUPLICATE_POINT_THRESHOLD = 4;
+        internal const int VERTICAL_NOISE_POINT_THRESHOLD = 4;
         internal static readonly TouchPointType[] VERTICAL_NOISE_POTENTIAL_TYPES = new TouchPointType[] { TouchPointType.LeftButton, TouchPointType.RightButton };
 
         internal byte[] Image { get; set; }
@@ -50,7 +50,7 @@ namespace TouchMouseExperiment
                 {
                     // Y is inverted
                     var lowPoint = TouchPoints.Min(x => x.FocalPointY);
-                    var highestPointAllowed = lowPoint + VERTICAL_DUPLICATE_POINT_THRESHOLD;
+                    var highestPointAllowed = lowPoint + VERTICAL_NOISE_POINT_THRESHOLD;
                     TouchPoints.RemoveAll(x => x.TouchPointType == touchType && x.FocalPointY > highestPointAllowed);
                 }
 
@@ -140,7 +140,7 @@ namespace TouchMouseExperiment
         private void CheckForTaps()
         {
             var taps = TouchPoints.Where(x => (x.TouchPointType == TouchPointType.LeftButton || x.TouchPointType == TouchPointType.RightButton)
-                && x.Movements.Count == 0 && x.Movement.InactiveFrameCount <= Movement.INACTIVITY_FRAME_THRESHOLD
+                && x.Movements.Count == 0 && x.Movement.InactiveMillis <= Movement.INACTIVITY_MILLIS_THRESHOLD
                 && x.HasBeenFollowed == false);
             
             if (taps.Count() == 1)

@@ -22,12 +22,12 @@ namespace TouchMouseExperiment
     class Movement
     {
         internal const double MOVEMENT_THRESHOLD = 2.5;
-        internal const int INACTIVITY_FRAME_THRESHOLD = 1;
+        internal const int INACTIVITY_MILLIS_THRESHOLD = 100;
         internal MovementDirection Direction { get; set; }
         internal double Magnitude { get; set; }
         internal int XMovement { get; set; }
         internal int YMovement { get; set; }
-        internal int InactiveFrameCount { get; set; }
+        internal int InactiveMillis { get; set; }
 
         public override string ToString()
         {
@@ -42,7 +42,7 @@ namespace TouchMouseExperiment
                 movement.Direction = MovementDirection.New;
                 movement.XMovement = 0;
                 movement.YMovement = 0;
-                movement.InactiveFrameCount = 0;
+                movement.InactiveMillis = 0;
             }
             else
             {
@@ -54,7 +54,7 @@ namespace TouchMouseExperiment
                 {
                     movement.XMovement += previous.Movement.XMovement;
                     movement.YMovement += previous.Movement.YMovement;
-                    movement.InactiveFrameCount = previous.Movement.InactiveFrameCount;
+                    movement.InactiveMillis = previous.Movement.InactiveMillis;
                 }
                 movement.Magnitude = previous.DistanceTo(current);
                 
@@ -65,7 +65,7 @@ namespace TouchMouseExperiment
                 else
                 {
                     movement.Direction = MovementDirection.None;
-                    movement.InactiveFrameCount++;
+                    movement.InactiveMillis += TouchMouse.SAMPLING_RATE;
                 }
             }
 
