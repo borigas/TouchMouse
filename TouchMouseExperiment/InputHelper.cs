@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace TouchMouseExperiment
 {
-    public class InputHelper
+    public static class InputHelper
     {
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         private static extern void mouse_event(long dwFlags, long dx, long dy, long cButtons, long dwExtraInfo);
@@ -23,25 +23,55 @@ namespace TouchMouseExperiment
         private const int MOUSEEVENTF_MIDDLEUP = 0x40;
 
         private const byte VK_MEDIA_PLAY_PAUSE = 0xB3;
+        private const byte VK_MEDIA_NEXT_TRACK = 0xB0;
+        private const byte VK_MEDIA_PREV_TRACK = 0xB1;
+        private const byte VK_VOLUME_UP = 0xAF;
+        private const byte VK_VOLUME_DOWN = 0xAE;
+        private const byte VK_VOLUME_MUTE = 0xAD;
 
         public static void LeftClick()
         {
             mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);
         }
 
-        internal static void RightClick()
+        public static void RightClick()
         {
             mouse_event(MOUSEEVENTF_RIGHTDOWN | MOUSEEVENTF_RIGHTUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);
         }
 
-        internal static void MiddleClick()
+        public static void MiddleClick()
         {
             mouse_event(MOUSEEVENTF_MIDDLEDOWN | MOUSEEVENTF_MIDDLEUP, Cursor.Position.X, Cursor.Position.Y, 0, 0);
         }
 
-        internal static void PlayPause()
+        public static void PlayPause()
         {
             keybd_event(VK_MEDIA_PLAY_PAUSE, 0, 0, 0);
+        }
+
+        public static void NextTrack()
+        {
+            keybd_event(VK_MEDIA_NEXT_TRACK, 0, 0, 0);
+        }
+
+        public static void PreviousTrack()
+        {
+            keybd_event(VK_MEDIA_PREV_TRACK, 0, 0, 0);
+        }
+
+        public static void VolumeUp()
+        {
+            keybd_event(VK_VOLUME_UP, 0, 0, 0);
+        }
+
+        public static void VolumeDown()
+        {
+            keybd_event(VK_VOLUME_DOWN, 0, 0, 0);
+        }
+
+        public static void Mute()
+        {
+            keybd_event(VK_VOLUME_MUTE, 0, 0, 0);
         }
     }
 }
