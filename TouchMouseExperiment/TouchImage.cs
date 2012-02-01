@@ -139,9 +139,8 @@ namespace TouchMouseExperiment
 
         private void CheckForTaps()
         {
-            var taps = TouchPoints.Where(x => (x.TouchPointType == TouchPointType.LeftButton || x.TouchPointType == TouchPointType.RightButton)
-                && x.Movements.Count == 0 && x.Movement.InactiveMillis <= Movement.INACTIVITY_MILLIS_THRESHOLD
-                && x.HasBeenFollowed == false);
+            var taps = TouchPoints.Where(x => x.IsButton() && x.HasBeenFollowed == false && x.Movements.Count == 0 
+                && x.Movement.InactiveMillis <= Movement.INACTIVITY_MILLIS_THRESHOLD);
             
             if (taps.Count() == 1)
             {
@@ -170,7 +169,7 @@ namespace TouchMouseExperiment
                     TriggeringTouchPoint = taps.First(),
                 });
             }
-            else if (taps.Count() == 3)
+            else if (taps.Count() == 3 && TouchMouse.OnThreeFingerTap != null)
             {
                 TouchMouse.OnThreeFingerTap(this, new TouchMouseGestureEventArgs()
                 {

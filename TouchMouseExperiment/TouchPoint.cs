@@ -154,10 +154,10 @@ namespace TouchMouseExperiment
                 //previousPoint = previousImage.TouchPoints.Where(x => x.TouchPointType == this.TouchPointType).OrderBy(x => this.DistanceTo(x)).FirstOrDefault();
                 previousPoint = previousImage.TouchPoints.FirstOrDefault(x => x.TouchPointType == this.TouchPointType && !x.HasBeenFollowed);
                 // Try checking points from button region if this point is a button
-                if (previousPoint == null && (this.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || this.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton))
+                if (previousPoint == null && (this.IsButton()))
                 {
-                    //previousPoint = previousImage.TouchPoints.Where(x => x.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || x.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton).OrderBy(x => this.DistanceTo(x)).FirstOrDefault();
-                    previousPoint = previousImage.TouchPoints.FirstOrDefault(x => !x.HasBeenFollowed && (x.TouchPointType == TouchMouseExperiment.TouchPointType.LeftButton || x.TouchPointType == TouchMouseExperiment.TouchPointType.RightButton));
+                    //previousPoint = previousImage.TouchPoints.Where(x => x.IsButton()).OrderBy(x => this.DistanceTo(x)).FirstOrDefault();
+                    previousPoint = previousImage.TouchPoints.FirstOrDefault(x => !x.HasBeenFollowed && x.IsButton());
                 }
             }
 
@@ -185,6 +185,11 @@ namespace TouchMouseExperiment
         internal double DistanceTo(TouchPoint otherPoint)
         {
             return MathHelpers.PythagoreanDistance(FocalPointX - otherPoint.FocalPointX, FocalPointY - otherPoint.FocalPointY);
+        }
+
+        internal bool IsButton()
+        {
+            return this.TouchPointType == TouchPointType.LeftButton || this.TouchPointType == TouchPointType.RightButton;
         }
     }
 }
