@@ -99,6 +99,19 @@ namespace TouchMouseExperiment
             //MainWindow.SetMessage("Elapsed: " + sw.ElapsedMilliseconds);
 
             bool hasPrinted = false;
+
+            if (currentImage.CenterOfGravity != null && currentImage.CenterOfGravity.Movement != null
+                && currentImage.CenterOfGravity.Movement.Magnitude > Movement.MOVEMENT_THRESHOLD)
+            {
+                Trace.WriteLine(string.Format("{0}, {1}: {2}, {3}: {4}: {5}", currentImage.CenterOfGravity.FocalPointX,
+                    currentImage.CenterOfGravity.FocalPointY, currentImage.CenterOfGravity.Movement.XMovement,
+                    currentImage.CenterOfGravity.Movement.YMovement, currentImage.CenterOfGravity.Movement.Magnitude,
+                    currentImage.CenterOfGravity.TouchPointType));
+                Trace.WriteLine(string.Join<Movement>(", ", currentImage.CenterOfGravity.Movements));
+                Trace.WriteLine("*********************");
+                hasPrinted = true;
+            }
+
             if (currentImage.TouchPoints.Count(x => x.Movement.Magnitude > Movement.MOVEMENT_THRESHOLD) > 0)
             {
                 int movementCount = 0;
@@ -107,12 +120,13 @@ namespace TouchMouseExperiment
                     movementCount += point.Movements.Count;
                     //if (point.Gesture != null && point.Movement.Magnitude > Movement.MOVEMENT_THRESHOLD)//point.Gesture.LastOrDefault() == point.Movement)
                     //{
-                    Trace.WriteLine(string.Format("{0}, {1}: {2}, {3}: {4}: {5}", point.FocalPointX, point.FocalPointY, point.Movement.XMovement, point.Movement.YMovement, point.Movement.Magnitude, point.TouchPointType));
-                    Trace.WriteLine(string.Join<Movement>(", ", point.Movements));
+                    Trace.WriteLine(string.Format("{0}, {1}: {2}, {3}: {4}: {5}: {6}", point.FocalPointX, point.FocalPointY, point.Movement.XMovement, point.Movement.YMovement, point.Movement.Magnitude, point.Movement.Direction, point.TouchPointType));
+                    Trace.WriteLine(string.Join<Movement>(", ", currentImage.CenterOfGravity.Movements));
                     Trace.WriteLine("*********************");
                     hasPrinted = true;
                 }
             }
+
             if (hasPrinted)
             {
                 System.Diagnostics.Trace.WriteLine("------------------- End Frame " + _frameNumber + " --------------------");

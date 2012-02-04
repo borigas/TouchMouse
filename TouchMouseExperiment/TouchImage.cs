@@ -10,12 +10,15 @@ namespace TouchMouseExperiment
     internal class TouchImage
     {
         internal const byte TOUCH_THRESHOLD = 0xC0;
+        internal const int TOUCH_MASS_THRESHOLD = 1500;
         internal const int VERTICAL_NOISE_POINT_THRESHOLD = 4;
         internal static readonly TouchPointType[] VERTICAL_NOISE_POTENTIAL_TYPES = new TouchPointType[] { TouchPointType.LeftButton, TouchPointType.RightButton };
 
         internal byte[] Image { get; set; }
         internal byte Width { get; set; }
         internal byte Height { get; set; }
+
+        internal TouchPoint CenterOfGravity { get; set; }
 
         internal List<TouchPoint> TouchPoints = new List<TouchPoint>();
 
@@ -27,8 +30,11 @@ namespace TouchMouseExperiment
 
         internal void FindTouchPoints()
         {
+            int xSum = 0;
+            int ySum = 0;
+            int cogPoints = 0;
             int i = 0;
-            while (i + 1 < Image.Length)
+            while (i < Image.Length)
             {
                 // If left and 3 above bytes are 0, this tp hasn't been added yet
                 if (Image[i] > 0 &&
@@ -37,9 +43,26 @@ namespace TouchMouseExperiment
                     (i - Width < 0 || Image[i - Width] == 0) &&
                     (i - Width - 1 < 0 || Image[i - Width - 1] == 0))
                 {
-                    TouchPoints.Add(TouchPoint.Create(this, i));
+                    var tp = TouchPoint.Create(this, i);
+                    //System.Diagnostics.Trace.WriteLine("Mass: " + tp.Mass);
+                    if (tp.Mass > TOUCH_MASS_THRESHOLD || !tp.IsButton())
+                    {
+                        TouchPoints.Add(TouchPoint.Create(this, i));
+                    }
+                }
+                if (Image[i] != 0)
+                {
+                    ySum += i / Width;
+                    xSum += i % Width;
+                    cogPoints++;
                 }
                 i++;
+            }
+
+            if (cogPoints != 0)
+            {
+                CenterOfGravity = TouchPoint.Create(xSum / cogPoints, ySum / cogPoints);
+                CenterOfGravity.TouchPointType = TouchPointType.CenterOfGravity;
             }
 
             // Remove points that are in the main button area and are well below the others
@@ -120,6 +143,10 @@ namespace TouchMouseExperiment
 
         internal void FindMovements(TouchImage previousImage)
         {
+            if (this.CenterOfGravity != null && previousImage != null)
+            {
+                this.CenterOfGravity.CreateMovement(previousImage.CenterOfGravity);
+            }
             foreach (var point in TouchPoints)
             {
                 point.CreateMovement(previousImage);
@@ -137,23 +164,26 @@ namespace TouchMouseExperiment
             CheckForTaps();
         }
 
-        private void CheckForTaps()
+        private bool CheckForTaps()
         {
-            var taps = TouchPoints.Where(x => x.IsButton() && x.HasBeenFollowed == false && x.Movements.Count == 0 
+            bool tapped = false;
+            var taps = TouchPoints.Where(x => x.IsButton() && x.HasBeenFollowed == false && x.Movements.Count == 0
                 && x.Movement.InactiveMillis <= Movement.INACTIVITY_MILLIS_THRESHOLD);
-            
+
             if (taps.Count() == 1)
             {
                 if (taps.First().TouchPointType == TouchPointType.LeftButton && TouchMouse.OnLeftTap != null)
                 {
+                    tapped = true;
                     TouchMouse.OnLeftTap(this, new TouchMouseGestureEventArgs()
                     {
                         TouchPoints = TouchPoints,
                         TriggeringTouchPoint = taps.First(),
                     });
                 }
-                else if(TouchMouse.OnRightTap != null)
+                else if (TouchMouse.OnRightTap != null)
                 {
+                    tapped = true;
                     TouchMouse.OnRightTap(this, new TouchMouseGestureEventArgs()
                     {
                         TouchPoints = TouchPoints,
@@ -163,6 +193,7 @@ namespace TouchMouseExperiment
             }
             else if (taps.Count() == 2 && TouchMouse.OnTwoFingerTap != null)
             {
+                tapped = true;
                 TouchMouse.OnTwoFingerTap(this, new TouchMouseGestureEventArgs()
                 {
                     TouchPoints = TouchPoints,
@@ -171,12 +202,14 @@ namespace TouchMouseExperiment
             }
             else if (taps.Count() == 3 && TouchMouse.OnThreeFingerTap != null)
             {
+                tapped = true;
                 TouchMouse.OnThreeFingerTap(this, new TouchMouseGestureEventArgs()
                 {
                     TouchPoints = TouchPoints,
                     TriggeringTouchPoint = taps.First(),
                 });
             }
+            return tapped;
         }
     }
 }

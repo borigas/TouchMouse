@@ -50,7 +50,7 @@ namespace TouchMouseExperiment
                 // Y is flipped because positive needs to be UP
                 movement.YMovement = previous.FocalPointY - current.FocalPointY;
                 // Add last 1 if it didn't break threshold
-                if (previous.Movement.Magnitude < MOVEMENT_THRESHOLD)
+                if (previous.Movement != null && previous.Movement.Magnitude < MOVEMENT_THRESHOLD)
                 {
                     movement.XMovement += previous.Movement.XMovement;
                     movement.YMovement += previous.Movement.YMovement;

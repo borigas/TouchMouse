@@ -12,6 +12,7 @@ namespace TouchMouseExperiment
         RightButton,
         LeftEdge,
         RightEdge,
+        CenterOfGravity,
     }
 
     public class TouchPoint
@@ -25,6 +26,8 @@ namespace TouchMouseExperiment
         internal int Bottom { get; set; }
         internal int Left { get; set; }
         internal int Right { get; set; }
+
+        internal int Mass { get; set; }
 
         public int FocalPointX { get; set; }
         public int FocalPointY { get; set; }
@@ -43,6 +46,17 @@ namespace TouchMouseExperiment
         {
             int x = i % touchImage.Width;
             int y = i / touchImage.Width;
+            TouchPoint touchPoint = Create(x, y);
+
+            touchPoint.FocalPointValue = touchImage[x, y];
+            touchPoint.FindAdjacentPoints(touchImage, x, y);
+            touchPoint.FindType(touchImage.Width);
+
+            return touchPoint;
+        }
+
+        internal static TouchPoint Create(int x, int y)
+        {
             TouchPoint touchPoint = new TouchPoint()
             {
                 Top = y,
@@ -51,12 +65,7 @@ namespace TouchMouseExperiment
                 Right = x,
                 FocalPointX = x,
                 FocalPointY = y,
-                FocalPointValue = touchImage[x, y],
             };
-
-            touchPoint.FindAdjacentPoints(touchImage, x, y);
-            touchPoint.FindType(touchImage.Width);
-
             return touchPoint;
         }
 
@@ -116,6 +125,8 @@ namespace TouchMouseExperiment
 
         private void AddValidPoint(TouchImage image, int x, int y)
         {
+            Mass += image[x, y];
+
             if (FocalPointValue < image[x, y])
             {
                 FocalPointValue = image[x, y];
@@ -143,6 +154,7 @@ namespace TouchMouseExperiment
                 System.Diagnostics.Trace.WriteLine("Y:" + y + "should not be less than Top:" + Top);
             }
 
+            FindAdjacentPoints(image, x, y);
             System.Diagnostics.Debug.Assert(y >= Top, "Y:" + y + "should be >= than Top:" + Top);
         }
 
@@ -161,6 +173,11 @@ namespace TouchMouseExperiment
                 }
             }
 
+            CreateMovement(previousPoint);
+        }
+
+        internal void CreateMovement(TouchPoint previousPoint)
+        {
             if (previousPoint != null)
             {
                 previousPoint.HasBeenFollowed = true;

@@ -34,26 +34,26 @@ namespace TouchMouseExperiment
             // Ensure the image rendering does not interpolate
             RenderOptions.SetBitmapScalingMode(SensorImage, BitmapScalingMode.NearestNeighbor);
 
-            TouchMouse.OnLeftTap += (object sender, TouchMouseGestureEventArgs e) =>
-            {
-                SetMessage("Left Click for " + e.TriggeringTouchPoint.Movement.InactiveMillis / TouchMouse.SAMPLING_RATE + " Frames");
-                InputHelper.LeftClick();
-            };
-            TouchMouse.OnRightTap += (object sender, TouchMouseGestureEventArgs e) =>
-            {
-                SetMessage("Right Click for " + e.TriggeringTouchPoint.Movement.InactiveMillis / TouchMouse.SAMPLING_RATE + " Frames");
-                InputHelper.RightClick();
-            };
-            TouchMouse.OnTwoFingerTap += (object sender, TouchMouseGestureEventArgs e) =>
-            {
-                SetMessage("Left/Right Click for " + e.TouchPoints.Max(x => x.Movement.InactiveMillis + ((x.Movement.InactiveMillis <= Movement.INACTIVITY_MILLIS_THRESHOLD) ? 0 : int.MinValue)) / TouchMouse.SAMPLING_RATE + " Frames");
-                InputHelper.MiddleClick();
-            };
-            TouchMouse.OnThreeFingerTap += (object sender, TouchMouseGestureEventArgs e) =>
-            {
-                SetMessage("3 Finger Click for " + e.TouchPoints.Max(x => x.Movement.InactiveMillis + ((x.Movement.InactiveMillis <= Movement.INACTIVITY_MILLIS_THRESHOLD) ? 0 : int.MinValue)) / TouchMouse.SAMPLING_RATE + " Frames");
-                InputHelper.PlayPause();
-            };
+            //TouchMouse.OnLeftTap += (object sender, TouchMouseGestureEventArgs e) =>
+            //{
+            //    SetMessage("Left Click for " + e.TriggeringTouchPoint.Movement.InactiveMillis / TouchMouse.SAMPLING_RATE + " Frames");
+            //    InputHelper.LeftClick();
+            //};
+            //TouchMouse.OnRightTap += (object sender, TouchMouseGestureEventArgs e) =>
+            //{
+            //    SetMessage("Right Click for " + e.TriggeringTouchPoint.Movement.InactiveMillis / TouchMouse.SAMPLING_RATE + " Frames");
+            //    InputHelper.RightClick();
+            //};
+            //TouchMouse.OnTwoFingerTap += (object sender, TouchMouseGestureEventArgs e) =>
+            //{
+            //    SetMessage("Left/Right Click for " + e.TouchPoints.Max(x => x.Movement.InactiveMillis + ((x.Movement.InactiveMillis <= Movement.INACTIVITY_MILLIS_THRESHOLD) ? 0 : int.MinValue)) / TouchMouse.SAMPLING_RATE + " Frames");
+            //    InputHelper.MiddleClick();
+            //};
+            //TouchMouse.OnThreeFingerTap += (object sender, TouchMouseGestureEventArgs e) =>
+            //{
+            //    SetMessage("3 Finger Click for " + e.TouchPoints.Max(x => x.Movement.InactiveMillis + ((x.Movement.InactiveMillis <= Movement.INACTIVITY_MILLIS_THRESHOLD) ? 0 : int.MinValue)) / TouchMouse.SAMPLING_RATE + " Frames");
+            //    InputHelper.PlayPause();
+            //};
 
 
             TouchMouse.Start();
