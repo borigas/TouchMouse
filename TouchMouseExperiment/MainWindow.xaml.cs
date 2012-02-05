@@ -53,24 +53,24 @@ namespace TouchMouseExperiment
                 InputHelper.PlayPause();
             };
 
-            //TouchMouse.OnCenterOfGravityUp += (object sender, TouchMouseGestureEventArgs e) =>
-            //{
-            //    SetMessage(((TouchImage)sender).FrameNumber + " COG Up");
-            //    InputHelper.VolumeUp(3);
-            //};
-            //TouchMouse.OnCenterOfGravityDown += (object sender, TouchMouseGestureEventArgs e) =>
-            //{
-            //    SetMessage(((TouchImage)sender).FrameNumber + " COG Down");
-            //    InputHelper.VolumeDown(3);
-            //};
-            //TouchMouse.OnCenterOfGravityRight += (object sender, TouchMouseGestureEventArgs e) =>
-            //{
-            //    SetMessage(((TouchImage)sender).FrameNumber + " COG Right");
-            //};
-            //TouchMouse.OnCenterOfGravityLeft += (object sender, TouchMouseGestureEventArgs e) =>
-            //{
-            //    SetMessage(((TouchImage)sender).FrameNumber + " COG Left");
-            //};
+            TouchMouse.OnCenterOfGravityUp += (object sender, TouchMouseGestureEventArgs e) =>
+            {
+                SetMessage(((TouchImage)sender).FrameNumber + " COG Up");
+                InputHelper.VolumeUp(3);
+            };
+            TouchMouse.OnCenterOfGravityDown += (object sender, TouchMouseGestureEventArgs e) =>
+            {
+                SetMessage(((TouchImage)sender).FrameNumber + " COG Down");
+                InputHelper.VolumeDown(3);
+            };
+            TouchMouse.OnCenterOfGravityRight += (object sender, TouchMouseGestureEventArgs e) =>
+            {
+                SetMessage(((TouchImage)sender).FrameNumber + " COG Right");
+            };
+            TouchMouse.OnCenterOfGravityLeft += (object sender, TouchMouseGestureEventArgs e) =>
+            {
+                SetMessage(((TouchImage)sender).FrameNumber + " COG Left");
+            };
 
 
             TouchMouse.Start();
