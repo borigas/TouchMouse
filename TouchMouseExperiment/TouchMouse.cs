@@ -20,6 +20,11 @@ namespace TouchMouseExperiment
         public static TouchMouseGestureHandler OnTwoFingerTap;
         public static TouchMouseGestureHandler OnThreeFingerTap;
 
+        public static TouchMouseGestureHandler OnCenterOfGravityUp;
+        public static TouchMouseGestureHandler OnCenterOfGravityDown;
+        public static TouchMouseGestureHandler OnCenterOfGravityRight;
+        public static TouchMouseGestureHandler OnCenterOfGravityLeft;
+
         private DispatcherTimer _timer = null;
         private TouchImage _previousImage = null;
         private TouchMouseSensorEventArgs _args = null;
@@ -64,10 +69,12 @@ namespace TouchMouseExperiment
         private void TimerTick(object state, EventArgs e)
         {
             _frameNumber++;
-            MainWindow.ClearMessage();
 
             if (_args == null)
+            {
+                MainWindow.SetSensorImage(TouchImage.GetEmptyImage());
                 return;
+            }
 
             //Stopwatch sw = new Stopwatch();
             //sw.Start();
@@ -77,6 +84,7 @@ namespace TouchMouseExperiment
                 Height = (byte)_args.Status.m_dwImageHeight,
                 Width = (byte)_args.Status.m_dwImageWidth,
                 Image = _args.Image,
+                FrameNumber = _frameNumber,
             };
 
             currentImage.FindTouchPoints();

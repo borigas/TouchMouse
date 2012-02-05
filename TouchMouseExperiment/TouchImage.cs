@@ -10,13 +10,14 @@ namespace TouchMouseExperiment
     internal class TouchImage
     {
         internal const byte TOUCH_THRESHOLD = 0xC0;
-        internal const int TOUCH_MASS_THRESHOLD = 1500;
+        internal const int TOUCH_MASS_THRESHOLD = 1000;
         internal const int VERTICAL_NOISE_POINT_THRESHOLD = 4;
         internal static readonly TouchPointType[] VERTICAL_NOISE_POTENTIAL_TYPES = new TouchPointType[] { TouchPointType.LeftButton, TouchPointType.RightButton };
 
         internal byte[] Image { get; set; }
         internal byte Width { get; set; }
         internal byte Height { get; set; }
+        internal long FrameNumber { get; set; }
 
         internal TouchPoint CenterOfGravity { get; set; }
 
@@ -78,6 +79,15 @@ namespace TouchMouseExperiment
                 }
 
             }
+        }
+
+        internal static ImageSource GetEmptyImage()
+        {
+            int height = 15;
+            int width = 13;
+            
+            return BitmapSource.Create(width, height, 96, 96,
+                PixelFormats.Gray8, null, new byte[height * width], width);
         }
 
         internal ImageSource GetSensorImage()
@@ -160,8 +170,67 @@ namespace TouchMouseExperiment
             //foreach (var endedPoint in endedPoints)
             //{
             //}
+            CheckForCenterOfGravityGesture();
 
             CheckForTaps();
+        }
+
+        private bool CheckForCenterOfGravityGesture()
+        {
+            // If there is multiple points
+            bool eventOccurred = false;
+            if (CenterOfGravity != null && CenterOfGravity.Movement != null)
+            //if (TouchPoints.Count > 1 && CenterOfGravity != null && CenterOfGravity.Movement != null)
+            {
+                switch (CenterOfGravity.Movement.Direction)
+                {
+                    case MovementDirection.Up:
+                        if (TouchMouse.OnCenterOfGravityRight != null)
+                        {
+                            eventOccurred = true;
+                            TouchMouse.OnCenterOfGravityUp(this, new TouchMouseGestureEventArgs()
+                                                                     {
+                                                                         TouchPoints = TouchPoints,
+                                                                         TriggeringTouchPoint = CenterOfGravity,
+                                                                     });
+                        }
+                        break;
+                    case MovementDirection.Down:
+                        if (TouchMouse.OnCenterOfGravityRight != null)
+                        {
+                            eventOccurred = true;
+                            TouchMouse.OnCenterOfGravityDown(this, new TouchMouseGestureEventArgs()
+                                                                       {
+                                                                           TouchPoints = TouchPoints,
+                                                                           TriggeringTouchPoint = CenterOfGravity,
+                                                                       });
+                        }
+                        break;
+                    case MovementDirection.Right:
+                        if (TouchMouse.OnCenterOfGravityRight != null)
+                        {
+                            eventOccurred = true;
+                            TouchMouse.OnCenterOfGravityRight(this, new TouchMouseGestureEventArgs()
+                                                                        {
+                                                                            TouchPoints = TouchPoints,
+                                                                            TriggeringTouchPoint = CenterOfGravity,
+                                                                        });
+                        }
+                        break;
+                    case MovementDirection.Left:
+                        if (TouchMouse.OnCenterOfGravityRight != null)
+                        {
+                            eventOccurred = true;
+                            TouchMouse.OnCenterOfGravityLeft(this, new TouchMouseGestureEventArgs()
+                                                                       {
+                                                                           TouchPoints = TouchPoints,
+                                                                           TriggeringTouchPoint = CenterOfGravity,
+                                                                       });
+                        }
+                        break;
+                }
+            }
+            return eventOccurred;
         }
 
         private bool CheckForTaps()

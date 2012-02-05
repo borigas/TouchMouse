@@ -59,14 +59,20 @@ namespace TouchMouseExperiment
             keybd_event(VK_MEDIA_PREV_TRACK, 0, 0, 0);
         }
 
-        public static void VolumeUp()
+        public static void VolumeUp(int units)
         {
-            keybd_event(VK_VOLUME_UP, 0, 0, 0);
+            for (int i = 0; i < units; i++)
+            {
+                keybd_event(VK_VOLUME_UP, 0, 0, 0);
+            }
         }
 
-        public static void VolumeDown()
+        public static void VolumeDown(int units)
         {
-            keybd_event(VK_VOLUME_DOWN, 0, 0, 0);
+            for (int i = 0; i < units; i++)
+            {
+                keybd_event(VK_VOLUME_DOWN, 0, 0, 0);
+            }
         }
 
         public static void Mute()
